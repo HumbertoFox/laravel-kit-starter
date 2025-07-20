@@ -1,12 +1,13 @@
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { Eye, EyeClosed, LoaderCircle } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
 
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { Icon } from '@/components/ui/icon';
 
 interface ResetPasswordProps {
     token: string;
@@ -21,12 +22,17 @@ type ResetPasswordForm = {
 };
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
+    const [isVisibledPassword, setIsVisibledPassword] = useState<boolean>(false);
+    const [isVisibledPasswordConfirm, setIsVisibledPasswordConfirm] = useState<boolean>(false);
     const { data, setData, post, processing, errors, reset } = useForm<Required<ResetPasswordForm>>({
         token: token,
         email: email,
         password: '',
         password_confirmation: '',
     });
+
+    const togglePasswordVisibility = () => setIsVisibledPassword(!isVisibledPassword);
+    const togglePasswordConfirmVisibility = () => setIsVisibledPasswordConfirm(!isVisibledPasswordConfirm);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -58,32 +64,50 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
 
                     <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            name="password"
-                            autoComplete="new-password"
-                            value={data.password}
-                            className="mt-1 block w-full"
-                            autoFocus
-                            onChange={(e) => setData('password', e.target.value)}
-                            placeholder="Password"
-                        />
+                        <div className="relative">
+                            <Input
+                                id="password"
+                                type={isVisibledPassword ? "text" : "password"}
+                                name="password"
+                                autoComplete="new-password"
+                                value={data.password}
+                                className="mt-1 block w-full"
+                                autoFocus
+                                onChange={(e) => setData('password', e.target.value)}
+                                placeholder="Password"
+                            />
+                            <button
+                                type="button"
+                                className='absolute right-2 top-[6px] opacity-30 hover:opacity-100 duration-300 cursor-pointer'
+                                onClick={togglePasswordVisibility}
+                            >
+                                {isVisibledPassword ? <Icon iconNode={Eye} /> : <Icon iconNode={EyeClosed} />}
+                            </button>
+                        </div>
                         <InputError message={errors.password} />
                     </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="password_confirmation">Confirm password</Label>
-                        <Input
-                            id="password_confirmation"
-                            type="password"
-                            name="password_confirmation"
-                            autoComplete="new-password"
-                            value={data.password_confirmation}
-                            className="mt-1 block w-full"
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
-                            placeholder="Confirm password"
-                        />
+                        <div className="relative">
+                            <Input
+                                id="password_confirmation"
+                                type={isVisibledPasswordConfirm ? "text" : "password"}
+                                name="password_confirmation"
+                                autoComplete="new-password"
+                                value={data.password_confirmation}
+                                className="mt-1 block w-full"
+                                onChange={(e) => setData('password_confirmation', e.target.value)}
+                                placeholder="Confirm password"
+                            />
+                            <button
+                                type="button"
+                                className='absolute right-2 top-[6px] opacity-30 hover:opacity-100 duration-300 cursor-pointer'
+                                onClick={togglePasswordConfirmVisibility}
+                            >
+                                {isVisibledPasswordConfirm ? <Icon iconNode={Eye} /> : <Icon iconNode={EyeClosed} />}
+                            </button>
+                        </div>
                         <InputError message={errors.password_confirmation} className="mt-2" />
                     </div>
 

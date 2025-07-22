@@ -221,88 +221,125 @@ These components together handle the creation and editing of admin/user accounts
 
 ---
 
-### 👥 UsersShow Component (with Pagination)
-The UsersShow component is a full-featured React component built with Inertia.js and TypeScript, designed to list, edit, and delete users in a paginated view within the admin panel.
+### 📄 Component: UsersShow
+The `UsersShow` component is an administrative view that displays a paginated list of users, built with `React + Inertia.js`, and connected to a Laravel backend.
 
-### 🧩 Key Features
-- User Table Listing:
+### ⚙️ Features
+- ✅ Displays a user table with: `position`, `ID`, `name`, and `email`.
 
-  - Displays users in a well-structured table layout.
+- 🖊️ Edit button: redirects to the user edit page.
 
-  - Columns: Index number (based on pagination), ID, Name, Email, and Actions.
+- ❌ Delete button: opens a confirmation dialog before sending a `DELETE` request.
 
-  - Styled using custom Table, TableHead, TableBody, TableRow, etc.
+- 🔢 Pagination: navigate between pages dynamically.
 
-- Edit & Delete Actions:
+- 🧭 Breadcrumbs for better navigation inside the admin panel.
 
-  - Edit user via a link using a pencil icon (UserPen).
+- 🔄 Uses Inertia’s useForm for smooth, `SPA-style` interactions.
 
-  - Delete action uses a Dialog confirmation modal to prevent accidental deletions.
-
-  - After deletion, the user is redirected back to the updated list via router.visit.
-
-- Pagination:
-
-  - Full support for paginated data.
-
-  - Uses pagination metadata from the backend (links, current_page, per_page, etc.).
-
-  - Custom pagination UI using Pagination, PaginationItem, and PaginationLink components.
-
-  - Displays previous/next arrows (ChevronLeft, ChevronRight) and page numbers.
-
-  - Supports both active/inactive link states and gracefully handles null URLs (disabled pages).
-
-  - Calculates the correct user number across pages using:
+### 📥 Props Structure
+The component expects a users object structured as follows (Laravel pagination format):
 
 ```ts
 
-index + 1 + (users.current_page - 1) * users.per_page
+{
+  data?: User[];
+  current_page: number;
+  last_page: number;
+  next_page_url: string | null;
+  prev_page_url: string | null;
+  path: string;
+  per_page: number;
+  total: number;
+}
 
 ```
 
-Empty State:
+This is typically returned by Laravel’s paginate() method.
 
-Shows a friendly message if no users are found: "No registered users."
+### 🧩 Component Overview
 
-### 🛠 Technologies Used
-- React + TypeScript
+```tsx
 
-- Inertia.js for SPA-like navigation and form handling
+<AppLayout breadcrumbs={breadcrumbs}>
+  <Head title="Users" />
+  <Table>...</Table>
+  <Pagination>...</Pagination>
+</AppLayout>
 
-- Tailwind CSS for styling
+```
 
--Lucide Icons for UI actions (UserPen, UserX, ChevronLeft, ChevronRight)
+- AppLayout: Shared layout wrapper.
 
-- Reusable components:
+- Table: Displays each user row.
 
-  - Table: Table, TableHead, TableRow, etc.
+- Pagination: Renders page navigation.
 
-  - Dialog: Confirmation modal before deletion.
+- Dialog: Used for confirming user deletion.
 
-  - Pagination: Custom pagination built from backend link structure.
+- useForm: Handles deletion requests with feedback.
 
-### 📦 Props Structure
+### 🔢 Pagination Explained
+Pagination only shows the most relevant pages:
+
+- The current page
+
+- The previous page
+
+- The next page
+
+Example
+If you're on page 5, it will display:
+
+```css
+
+← 4 [5] 6 →
+
+```
+
+- Left arrow appears if there's a previous page.
+
+- Right arrow appears if there's a next page.
+
+- The current page is visually highlighted using isActive.
+
+Pagination Logic
 
 ```ts
 
-type PaginatedUsersProps = {
-  users: {
-    data?: User[];
-    links?: Link[];
-    current_page: number;
-    per_page: number;
-    total: number;
-    // and other pagination metadata...
-  };
-};
+Array.from({ length: users.last_page }, (_, i) => i + 1)
+  .filter(page =>
+    page === users.current_page ||
+    page === users.current_page - 1 ||
+    page === users.current_page + 1
+  )
 
 ```
+
+This ensures clean and minimal pagination UI.
+
+### 💡 Future Improvements
+- Add ... for skipped pages.
+
+- Include “First” and “Last” buttons.
+
+- Add a dropdown to jump to a specific page.
+
+### 🛠️ Tech Stack
+- React with Inertia.js
+
+- Laravel (`backend`)
+
+- Lucide Icons (`lucide-react`)
+
+- Custom reusable UI components
+
+- TypeScript types and layout abstraction
 
 ---
 
 ### 🧩 Requirements
-- Laravel 10+
+- Laravel 11+
 
 - User role enum (`App\Enums\Role`)
 

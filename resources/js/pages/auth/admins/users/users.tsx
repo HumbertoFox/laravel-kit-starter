@@ -121,42 +121,38 @@ export default function UsersShow({ users }: PaginatedUsersProps) {
                 </TableBody>
             </Table>
             {users?.links && (
-                <Pagination className='py-4'>
+                <Pagination className="py-4">
                     <PaginationContent>
-                        {users.links.map((link, index) => {
-                            const isPrevious = link.label.toLowerCase().includes('previous') || link.label.toLowerCase().includes('anterior');
-                            const isNext = link.label.toLowerCase().includes('next') || link.label.toLowerCase().includes('próximo');
-
-                            return (
-                                <PaginationItem key={index}>
-                                    {link.url ? (
-                                        <PaginationLink
-                                            href={link.url}
-                                            isActive={link.active}
-                                            className="flex items-center justify-center"
-                                        >
-                                            {isPrevious ? (
-                                                <ChevronLeft />
-                                            ) : isNext ? (
-                                                <ChevronRight />
-                                            ) : (
-                                                <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                                            )}
-                                        </PaginationLink>
-                                    ) : (
-                                        <span className="text-muted-foreground">
-                                            {isPrevious ? (
-                                                <ChevronLeft />
-                                            ) : isNext ? (
-                                                <ChevronRight />
-                                            ) : (
-                                                <span dangerouslySetInnerHTML={{ __html: link.label }} />
-                                            )}
-                                        </span>
-                                    )}
+                        {users.prev_page_url && (
+                            <PaginationItem>
+                                <PaginationLink href={users.prev_page_url} className="flex items-center justify-center">
+                                    <ChevronLeft />
+                                </PaginationLink>
+                            </PaginationItem>
+                        )}
+                        {Array.from({ length: users.last_page }, (_, i) => i + 1)
+                            .filter(page =>
+                                page === users.current_page ||
+                                page === users.current_page - 1 ||
+                                page === users.current_page + 1
+                            )
+                            .map(page => (
+                                <PaginationItem key={page}>
+                                    <PaginationLink
+                                        href={`${users.path}?page=${page}`}
+                                        isActive={users.current_page === page}
+                                    >
+                                        {page}
+                                    </PaginationLink>
                                 </PaginationItem>
-                            );
-                        })}
+                            ))}
+                        {users.next_page_url && (
+                            <PaginationItem>
+                                <PaginationLink href={users.next_page_url} className="flex items-center justify-center">
+                                    <ChevronRight />
+                                </PaginationLink>
+                            </PaginationItem>
+                        )}
                     </PaginationContent>
                 </Pagination>
             )}
